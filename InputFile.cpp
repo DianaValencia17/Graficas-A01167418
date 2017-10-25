@@ -1,42 +1,34 @@
-//Autor: Diana Laura Valencia Dominguez A01167418
-//********************************************************* /
-//
-//  Tarea1 Diana Valencia.cpp
-//  DianaValenciaTarea1
-//
-//  Created by Diana Valencia  on 2017-09-06.
-//
-//
-#include <iostream>
-#include <fstream>
-#include <sstream>
 #include "InputFile.h"
 
+#include <fstream>
+#include <iostream>
+#include <sstream>
 
-using namespace std;
-
-bool InputFile::Read(std::string FileName)
+bool InputFile::Read(std::string filename)
 {
-	fstream inFile;
-	std::string linea;
-	inFile.open(FileName);
-	if (!inFile) {
-		cout << "Unable to open file";
-		return false; // terminate with error
+	if (filename.empty())
+	{
+		std::cout << "No filename provided" << std::endl;
+		return false;
 	}
 
-	while (getline(inFile, linea)) {
-		_contents += " " + linea + "\n";
+	std::fstream inputFile(filename, std::fstream::in);
+
+	if (!inputFile.is_open())
+	{
+		std::cout << "Could not open file " << filename << std::endl;
+		return false;
 	}
-	inFile.close();
+
+	std::stringstream ss;
+	ss << inputFile.rdbuf();
+	_contents = ss.str();
+
 	return true;
-
-	
 }
 
 std::string InputFile::GetContents()
 {
 	return _contents;
 }
-
 
