@@ -1,8 +1,9 @@
 #pragma once
+
 #include <GL/glew.h>
 #include <GL/freeglut.h>
-#include <glm/glm.hpp>
-#include <vector>
+#include <string>
+
 class Shader
 {
 public:
@@ -10,8 +11,9 @@ public:
 	~Shader();
 
 	void CreateShader(std::string path, GLenum type);
+
 	GLuint GetHandle();
 
 private:
-	GLuint _shaderHandle; 
+	GLuint _shaderHandle;
 };

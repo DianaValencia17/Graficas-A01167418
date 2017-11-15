@@ -1,251 +1,206 @@
-#include <iostream>
 #include <GL/glew.h>
 #include <GL/freeglut.h>
+#include <iostream>
 #include <glm/glm.hpp>
 #include <vector>
-#include "InputFile.h"
-#include <iomanip>
+#include "Camera.h"
+#include "Mesh.h"
+#include "ShaderProgram.h"
 #include "Transform.h"
 
-// Identificador del manager de VBOs para un conjunto de vertices.
-//GLuint vao;
-//identifiacdor de manager shader
-//GLuint shaderProgram;
-
+Camera _camera;
+Mesh _mesh;
+Transform _transform;
+Transform _transform2;
+ShaderProgram _shaderProgram;
 
 // Función que va a inicializar toda la memoria del programa.
-//void Initialize()
-//{
+void Initialize()
+{
 	// Vamos a crear una lista que va a almacenar las posiciones
 	// en 2 dimensiones de un triángulo.
 	// Esto es en CPU y RAM.
-	//std::vector<glm::vec2> positions;
-	//positions.push_back(glm::vec2(-1.0f, -1.0f));
-	//positions.push_back(glm::vec2(1.0f, -1.0f));
-	//positions.push_back(glm::vec2(0.0f, 1.0f));
+	std::vector<glm::vec3> positions;
+	// Cara frontal
+	positions.push_back(glm::vec3(-3.0f, -3.0f, 3.0f));
+	positions.push_back(glm::vec3(3.0f, -3.0f, 3.0f));
+	positions.push_back(glm::vec3(3.0f, 3.0f, 3.0f));
+	positions.push_back(glm::vec3(-3.0f, 3.0f, 3.0f));
+	// Cara lateral derecha
+	positions.push_back(glm::vec3(3.0f, -3.0f, 3.0f));
+	positions.push_back(glm::vec3(3.0f, -3.0f, -3.0f));
+	positions.push_back(glm::vec3(3.0f, 3.0f, -3.0f));
+	positions.push_back(glm::vec3(3.0f, 3.0f, 3.0f));
+	// Cara de atras
+	positions.push_back(glm::vec3(-3.0f, -3.0f, -3.0f));
+	positions.push_back(glm::vec3(-3.0f, 3.0f, -3.0f));
+	positions.push_back(glm::vec3(3.0f, 3.0f, -3.0f));
+	positions.push_back(glm::vec3(3.0f, -3.0f, -3.0f));
+	// Cara lateral izquierda
+	positions.push_back(glm::vec3(-3.0f, -3.0f, 3.0f));
+	positions.push_back(glm::vec3(-3.0f, -3.0f, -3.0f));
+	positions.push_back(glm::vec3(-3.0f, 3.0f, -3.0f));
+	positions.push_back(glm::vec3(-3.0f, 3.0f, 3.0f));
+	// Cara de arriba
+	positions.push_back(glm::vec3(-3.0f, 3.0f, 3.0f));
+	positions.push_back(glm::vec3(3.0f, 3.0f, 3.0f));
+	positions.push_back(glm::vec3(3.0f, 3.0f, -3.0f));
+	positions.push_back(glm::vec3(-3.0f, 3.0f, -3.0f));
+	// Cara de abajo
+	positions.push_back(glm::vec3(-3.0f, -3.0f, 3.0f));
+	positions.push_back(glm::vec3(3.0f, -3.0f, 3.0f));
+	positions.push_back(glm::vec3(3.0f, -3.0f, -3.0f));
+	positions.push_back(glm::vec3(-3.0f, -3.0f, -3.0f));
 
 	// Vamos a crear una lista para almacenar colores RGB
 	// Esta lista está en CPU y RAM
-	//std::vector<glm::vec3> colors;
-	// RGB -> Rojo
-	//colors.push_back(glm::vec3(1.0f, 0.0f, 0.0f));
-	// RGB -> Verde
-	//colors.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
-	// RGB -> Azul
-	//colors.push_back(glm::vec3(0.0f, 0.0f, 1.0f));
+	std::vector<glm::vec3> colors;
+	// Cara frontal
+	colors.push_back(glm::vec3(1.0f, 0.0f, 0.0f));
+	colors.push_back(glm::vec3(1.0f, 0.0f, 0.0f));
+	colors.push_back(glm::vec3(1.0f, 0.0f, 0.0f));
+	colors.push_back(glm::vec3(1.0f, 0.0f, 0.0f));
+	// Cara lateral derecha
+	colors.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
+	colors.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
+	colors.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
+	colors.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
+	//Cara trasera
+	colors.push_back(glm::vec3(0.0f, 0.0f, 1.0f));
+	colors.push_back(glm::vec3(0.0f, 0.0f, 1.0f));
+	colors.push_back(glm::vec3(0.0f, 0.0f, 1.0f));
+	colors.push_back(glm::vec3(0.0f, 0.0f, 1.0f));
+	// Cara lateral izquierda
+	colors.push_back(glm::vec3(0.0f, 0.5f, 0.5f));
+	colors.push_back(glm::vec3(0.0f, 0.5f, 0.5f));
+	colors.push_back(glm::vec3(0.0f, 0.5f, 0.5f));
+	colors.push_back(glm::vec3(0.0f, 0.5f, 0.5f));
+	// Cara de arriba
+	colors.push_back(glm::vec3(0.5f, 0.0f, 0.5f));
+	colors.push_back(glm::vec3(0.5f, 0.0f, 0.5f));
+	colors.push_back(glm::vec3(0.5f, 0.0f, 0.5f));
+	colors.push_back(glm::vec3(0.5f, 0.0f, 0.5f));
+	//Cara de abajo
+	colors.push_back(glm::vec3(0.5f, 0.5f, 0.0f));
+	colors.push_back(glm::vec3(0.5f, 0.5f, 0.0f));
+	colors.push_back(glm::vec3(0.5f, 0.5f, 0.0f));
+	colors.push_back(glm::vec3(0.5f, 0.5f, 0.0f));
 
-	// Creamos un VAO y almacenamos el id en la variable vao.
-	// Este es el manager de VBOs
-	//glGenVertexArrays(1, &vao);
-	// Le decimos a OpenGL que queremos utilizar el manager.
-	// Todos los VBOs que creemos a partir de este punto y hasta
-	// que desactivemos este VAO, se van a asociar a este manager.
-	//glBindVertexArray(vao);
+	std::vector<unsigned int> indices = { 0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 15, 14, 12, 14, 13, 16, 17, 18, 16, 18, 19, 20, 23, 22, 20, 22, 21 };
 
-	// Identificador del VBO de posiciones. Aqui lo vamos a almacenar.
-	//GLuint positionsVBO;
-	// Creamos un VBO y almacenamos el id en la variable positionsVBO
-	//glGenBuffers(1, &positionsVBO);
-	// Le decimos a OpenGL que lo queremos utilizar como un atributo.
-	//glBindBuffer(GL_ARRAY_BUFFER, positionsVBO);
-	// Asignamos los datos al buffer y los mandamos a la tarjeta de video.
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * positions.size(),
-		//positions.data(), GL_STATIC_DRAW);
-	// Quiero activar el atributo con indice 0 en la tarjeta de video
-	//glEnableVertexAttribArray(0);
-	// Configuramos el atributo con indice 0 en la tarjeta de video.
-	//glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
-	// Desactivamos el uso del VBO de posiciones
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
+	_mesh.CreateMesh(24);
+	_mesh.SetPositionAttribute(positions, GL_STATIC_DRAW, 0);
+	_mesh.SetColorAttribute(colors, GL_STATIC_DRAW, 1);
+	_mesh.SetIndices(indices, GL_STATIC_DRAW);
 
-	//GLuint colorsVBO;
-	//glGenBuffers(1, &colorsVBO);
-	//glBindBuffer(GL_ARRAY_BUFFER, colorsVBO);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * colors.size(),
-	//	colors.data(), GL_STATIC_DRAW);
-	//glEnableVertexAttribArray(1);
-	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
+	_shaderProgram.CreateProgram();
+	_shaderProgram.AttachShader("Default.vert", GL_VERTEX_SHADER);
+	_shaderProgram.AttachShader("Default.frag", GL_FRAGMENT_SHADER);
+	_shaderProgram.SetAttribute(0, "VertexPosition");
+	_shaderProgram.SetAttribute(1, "VertexColor");
+	_shaderProgram.LinkProgram();
 
-	// Ya no quiero utilizar el VAO. Ya no se asociarán más VBOs a este VAO
-	//glBindVertexArray(0);
+	_transform.SetPosition(0.0f, 0.0f, -20.0f);
+	_transform2.SetPosition(0.0f, -10.0f, -20.0f);
 
-	//Leemos codigo fuente del vertex shader con la clase
-	//auxiliar InputFile
-	//InputFile ifile;
 
-	//ifile.Read("Default.vert");
-	//Obtenemos los contenidos leidos y los almacenamos en 
-	//un string vertexSource
-	//std::string vertexSource = ifile.GetContents();
-	//hacemos una conversion del dato (cast)
-	//porque no podemos mandar strings a openGL,
-	//se le manda un const GLchar*
-	//const GLchar *vertexSource_c =
-		//(const GLchar*)vertexSource.c_str();
-	//creamos un shader tipo Vertex Shader y guardamos su id 
-	//en la variable vertexShaderHandle
+}
 
-	//GLuint vertexShaderHandle = glCreateShader(GL_VERTEX_SHADER);
-	//Le mandamos el codigo fuente que leimos previamente en OpenGL
-	//glShaderSource(vertexShaderHandle, 1, &vertexSource_c, nullptr);
-	//le pedimos que lo compile.
-	//glCompileShader(vertexShaderHandle);
-
-	//GLint vertexShaderCompileSuccess = 0;
-	//glGetShaderiv(vertexShaderHandle, GL_COMPILE_STATUS, &vertexShaderCompileSuccess);
-	//if (vertexShaderCompileSuccess == GL_FALSE);
-	//{
-	//	GLint logLenght = 0;
-	//	glGetShaderiv(vertexShaderHandle, GL_INFO_LOG_LENGTH, &logLenght);
-	//	if (logLenght > 0)
-	//	{
-	//		std::vector<GLchar> compileLog(logLenght);
-	//		glGetShaderInfoLog(vertexShaderHandle, logLenght, &logLenght, &compileLog[0]);
-			
-	//		for (int i = 0; i < logLenght; i++)
-		//	{
-			//	std::cout << compileLog[i];
-	//		}
-		//	std::cout << std::endl;
-	//	}
-		//std::cout << "Shader Default.vert did not compiled" << std::endl;
-	//}
-
-	//ifile.Read("Default.frag");
-	//std::string fragmentSource = ifile.GetContents();
-	//const GLchar *fragmentSource_c = (const GLchar*)fragmentSource.c_str();
-	//GLuint fragmentShaderHandle = glCreateShader(GL_FRAGMENT_SHADER);
-	//glShaderSource(fragmentShaderHandle, 1, &fragmentSource_c, nullptr);
-	//glCompileShader(fragmentShaderHandle);
-
-	//creando manager de shaders
-	//almacenamos el identificador en la variable shaderProgram
-	//shaderProgram = glCreateProgram();
-	// el manager va a administrar el vertex shader con identificador vertexShaderHandle
-	//glAttachShader(shaderProgram, vertexShaderHandle);
-	//el manager va administrar el fragment shader con el identificador fragmentShaderHandle
-	//glAttachShader(shaderProgram, fragmentShaderHandle);
-	//asociamos el indice del buffer (VBO) de posiciones con el nombre de la variable que corresponde en el shader
-	//glBindAttribLocation(shaderProgram, 0, "VertexPosition");
-	//asociamos el buffer de colores con la variable que corresponde (vertexColor)
-	//glBindAttribLocation(shaderProgram, 1, "VertexColor");
-	//verificamos que las etapas de los shaders pueden trabajar en conjunto
-	//glLinkProgram(shaderProgram);
-
-//}
-
-//void MainLoop()
-//{
+void MainLoop()
+{
 	// Borramos el buffer de color y profundidad siempre al inicio de un nuevo frame.
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// Paso 1 no lo podemos hacer aún. (manager)
-//	glUseProgram(shaderProgram);
+	_transform.Rotate(0.04f, 0.04f, 0.04f, true);
+	
+	_transform2.SetScale(5.0f, 0.2f, 10.0f); 
 
-	// Paso 2: Activar un VAO
-//	glBindVertexArray(vao);
-	// Paso 3: Dibujamos
-//	glDrawArrays(GL_TRIANGLES, 0, 3);
-	// Paso 4: Desactivamos el VAO
-//	glBindVertexArray(0);
-	// Paso 5 aún no lo podemos hacer. (manager)
-//	glUseProgram(0);
+	_shaderProgram.Activate();
+	_shaderProgram.SetUniformMatrix("mvpMatrix", _camera.GetViewProjection() * _transform.GetModelMatrix());
+	_mesh.Draw(GL_TRIANGLES);
+	_shaderProgram.Deactivate();
 
+	_shaderProgram.Activate();
+	_shaderProgram.SetUniformMatrix("mvpMatrix", _camera.GetViewProjection() * _transform2.GetModelMatrix());
+	_mesh.Draw(GL_TRIANGLES);
+	_shaderProgram.Deactivate();
 
 	// Intercambiar los buffers (el que se estaba rendereando con el que se estaba
 	// mostrando).
-//	glutSwapBuffers();
-//}
+	glutSwapBuffers();
+}
 
-//int main(int argc, char* argv[])
-//{
+void Idle()
+{
+	// Cuando OpenGL entra en modo de reposo 
+	// (para guardar bateria, por ejemplo)
+	// le decimos que vuelva a dibujar ->
+	// Vuelve a mandar a llamar GameLoop
+	glutPostRedisplay();
+}
+
+void ReshapeWindow(int width, int height)
+{
+	glViewport(0, 0, width, height);
+	_camera.SetPerspective(1.0f, 1000.0f, 60.0f, (float)width / (float)height);
+}
+
+int main(int argc, char* argv[])
+{
 	// Inicializamos freeglut. 
 	// Freeglut se encarga de generar y manejar ventanas.
 	// Utilizamos freeglut para crear una ventana donde vamos a dibujar.
-//	glutInit(&argc, argv);
+	glutInit(&argc, argv);
 	// Tenemos que informar que queremos trabajar con el pipeline
 	// programable (OpenGL moderno).
-//	glutInitContextProfile(GLUT_CORE_PROFILE);
+	glutInitContextProfile(GLUT_CORE_PROFILE);
 	// Freeglut nos permite configurar eventos que ocurren en la ventana.
 	// Un evento que nos interesa es cuando alguien cierra la ventana.
 	// En este caso, simplemente dejamos de renderear y terminamos el programa.
-//	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
+	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
 	// Configuramos el framebuffer. En este caso estamos solicitando un buffer
 	// de color true color RGBA, un buffer de profundidad y un segundo buffer 
 	// para rendererar (evitamos parpadeos al renderear).
-//	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
+	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 	// Solicitamos una ventana de 400x400 pixeles.
-//	glutInitWindowSize(400, 400);
+	glutInitWindowSize(400, 400);
 	// Creamos y abrimos la ventana con un título personalizado.
-//	glutCreateWindow("Hello World OpenGL");
+	glutCreateWindow("Hello World OpenGL");
 	// Asociar una función de render. Esta función se mandará a llamar para 
 	// dibujar un frame.
-//	glutDisplayFunc(MainLoop);
+	glutDisplayFunc(MainLoop);
+	// Asociamos una función para el cambio de resolución
+	// de la ventana. Freeglut la va a mandar a llamar
+	// cuando alguien cambie el tamaño de la venta.
+	glutReshapeFunc(ReshapeWindow);
+	// Asociamos la función que se mandará a llamar
+	// cuando OpenGL entre en modo de reposo.
+	glutIdleFunc(Idle);
 
 	// Inicializamos GLEW. Esta librería se encarga de obtener el API
 	// de OpenGL de nuestra tarjeta de video. SHAME ON YOU MICROSOFT.
-//	glewInit();
+	glewInit();
 
 	// COnfigurar OpenGL. Este es el color por default del buffer de color
 	// en el framebuffer.
-//	glClearColor(1.0f, 1.0f, 0.5f, 1.0f);
+	glClearColor(1.0f, 1.0f, 0.5f, 1.0f);
+	// Ademas de solicitar el buffer de profundidad, tenemos
+	// que decirle a OpenGL que lo queremos activo
+	glEnable(GL_DEPTH_TEST);
+	// Activamos el borrado de caras traseras.
+	// Ahora todos los triangulos que dibujemos deben estar en CCW
+	glEnable(GL_CULL_FACE);
+	// No dibujar las caras traseras de las geometrías.
+	glCullFace(GL_BACK);
 
-//	std::cout << glGetString(GL_VERSION) << std::endl;
+	std::cout << glGetString(GL_VERSION) << std::endl;
 
 	// Configurar la memoria que la aplicación va a necesitar.
-//	Initialize();
+	Initialize();
 
 	// Iniciamos la aplicacion gráfica. El main se pausará en estea línea
 	// hasta que se cierre la ventana de OpenGL.
-//	glutMainLoop();
+	glutMainLoop();
 
-//	return 0;
-//}
-
-
-Transform rotation;
-Transform translation;
-Transform scale;
-Transform combined;
-
-void PrintTransform(Transform& t)
-{
-	glm::mat4 modelMatrix = t.GetModelMatrix();
-	for (size_t i = 0; i < modelMatrix.length(); i++)
-	{
-		for (size_t j = 0; j < modelMatrix.length(); j++)
-		{
-			std::cout << std::setw(10) << std::left << modelMatrix[j][i] << " ";
-
-		}
-		std::cout << std::endl;
-
-	}
-	std::cout << std::endl;
-
-}
-
-void Initialize()
-{
-	rotation.SetRotation(45, 90, 30);
-	PrintTransform(rotation);
-
-	translation.SetPosition(3, 5, -7);
-	PrintTransform(translation);
-
-	scale.SetScale(2, 3, 4);
-	PrintTransform(scale);
-
-	combined.SetRotation(45, 90, 30);
-	combined.SetPosition(3, 5, -7);
-	combined.SetScale(2, 3, 4);
-	PrintTransform(combined);
-
-}
-int main(int argc, char* argv[])
-{
-	Initialize();
-	getchar();
 	return 0;
 }
